@@ -13,6 +13,7 @@ import com.geektech.postapp.App;
 import com.geektech.postapp.data.models.PostModel;
 import com.geektech.postapp.databinding.FragmentFormBinding;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -20,8 +21,9 @@ import retrofit2.Response;
 
 public class FormFragment extends Fragment {
     private FragmentFormBinding binding;
-    private static final int GROUP_ID = 40;
-    private static final int USER_ID = 0;
+    public static final int GROUP_ID = 40;
+    private static final int USER_ID = 1;
+    private PostModel postModel;
 
     public FormFragment() {
     }
@@ -37,25 +39,48 @@ public class FormFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        String titles = FormFragmentArgs.fromBundle(getArguments()).getTitle();
+        String contents = FormFragmentArgs.fromBundle(getArguments()).getContent();
+
+        if (postModel != null) {
+            binding.etContent.setText(contents);
+            binding.etTitle.setText(titles);
+        }
         binding.btnSend.setOnClickListener(view1 -> {
             String title = binding.etTitle.getText().toString();
             String content = binding.etContent.getText().toString();
-            PostModel postModel = new PostModel(title, content, USER_ID, GROUP_ID);
-            App.api.createPost(postModel).enqueue(new Callback<PostModel>() {
-
-                @Override
-                public void onResponse(Call<PostModel> call, Response<PostModel> response) {
-                    if (response.isSuccessful()) {
-                        requireActivity().onBackPressed();
+            if (getArguments() != null) {
+                postModel.setContent(content);
+                postModel.setTitle(title);
+                App.api.updatePost(postModel.getId(), postModel).enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            requireActivity().onBackPressed();
+                        }
                     }
-                }
 
-                @Override
-                public void onFailure(Call<PostModel> call, Throwable t) {
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                }
-            });
+                    }
+                });
+            } else {
+                PostModel postModel = new PostModel(title, content, USER_ID, GROUP_ID);
+                App.api.createPost(postModel).enqueue(new Callback<PostModel>() {
+                    @Override
+                    public void onResponse(Call<PostModel> call, Response<PostModel> response) {
+                        if (response.isSuccessful()) {
+                            requireActivity().onBackPressed();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<PostModel> call, Throwable t) {
+
+                    }
+                });
+            }
         });
-
     }
 }

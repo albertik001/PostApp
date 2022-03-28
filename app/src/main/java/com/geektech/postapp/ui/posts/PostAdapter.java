@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.geektech.postapp.OnClick;
 import com.geektech.postapp.data.models.PostModel;
 import com.geektech.postapp.databinding.ItemPostBinding;
 
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
-
+    private static OnClick onClick;
     private List<PostModel> postModelList = new ArrayList<>();
 
     @SuppressLint("NotifyDataSetChanged")
@@ -22,6 +23,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         this.postModelList = postModelList;
         notifyDataSetChanged();
     }
+
+    public PostAdapter(OnClick onClick) {
+        this.onClick = onClick;
+    }
+
 
     @NonNull
     @Override
@@ -51,6 +57,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             binding.userId.setInputType(postModel.getUserId());
             binding.title.setText(postModel.getTitle());
             binding.content.setText(postModel.getContent());
+            itemView.setOnClickListener(view -> {
+                onClick.onClick(postModel);
+            });
+            itemView.setOnLongClickListener(view -> {
+                onClick.onLongClick(postModel);
+                return true;
+            });
         }
     }
 }

@@ -9,7 +9,7 @@
         android:id="@+id/postsFragment"
         android:name="com.geektech.postapp.ui.posts.PostsFragment"
         android:label="fragment_posts"
-        tools:layout="@layout/fragment_posts" >
+        tools:layout="@layout/fragment_posts">
         <action
             android:id="@+id/action_postsFragment_to_formFragment"
             app:destination="@id/formFragment" />
@@ -18,5 +18,15 @@
         android:id="@+id/formFragment"
         android:name="com.geektech.postapp.ui.form.FormFragment"
         android:label="fragment_form"
-        tools:layout="@layout/fragment_form" />
+        tools:layout="@layout/fragment_form">
+
+        <argument
+            app:nullable="true"
+            android:name="title"
+            app:argType="string" />
+        <argument
+            app:nullable="true"
+            android:name="content"
+            app:argType="string" />
+    </fragment>
 </navigation>

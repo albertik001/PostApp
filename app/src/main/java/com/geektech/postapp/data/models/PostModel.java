@@ -2,14 +2,18 @@ package com.geektech.postapp.data.models;
 
 import com.google.gson.annotations.SerializedName;
 
-public class PostModel {
-    int id;
+import java.io.Serializable;
+
+public class PostModel implements Serializable {
+    Integer id;
     String title;
     String content;
     @SerializedName("user")
     int userId;
+    @SerializedName("group")
+    int groupId;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -29,6 +33,14 @@ public class PostModel {
         return groupId;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public PostModel(String title, String content, int userId, int groupId) {
         this.title = title;
         this.content = content;
@@ -36,6 +48,4 @@ public class PostModel {
         this.groupId = groupId;
     }
 
-    @SerializedName("group")
-    int groupId;
 }

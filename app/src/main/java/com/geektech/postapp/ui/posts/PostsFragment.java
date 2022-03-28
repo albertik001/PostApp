@@ -1,6 +1,10 @@
 package com.geektech.postapp.ui.posts;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,23 +13,23 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.geektech.postapp.App;
+import com.geektech.postapp.OnClick;
 import com.geektech.postapp.R;
 import com.geektech.postapp.data.models.PostModel;
 import com.geektech.postapp.databinding.FragmentPostsBinding;
+import com.geektech.postapp.ui.form.FormFragment;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class PostsFragment extends Fragment {
+public class PostsFragment extends Fragment implements OnClick {
     private FragmentPostsBinding binding;
     private PostAdapter adapter;
     private NavController navController;
@@ -37,7 +41,7 @@ public class PostsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new PostAdapter();
+        adapter = new PostAdapter(this);
         navHostFragment = (NavHostFragment) requireActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         navController = navHostFragment.getNavController();
     }
@@ -57,10 +61,14 @@ public class PostsFragment extends Fragment {
         binding.fab.setOnClickListener(view1 -> {
             navController.navigate(R.id.action_postsFragment_to_formFragment);
         });
-        App.api.getPost().enqueue(new Callback<List<PostModel>>() {
+        getPostApi();
+    }
+
+    private void getPostApi() {
+        App.api.getPost(FormFragment.GROUP_ID).enqueue(new Callback<List<PostModel>>() {
             @Override
             public void onResponse(Call<List<PostModel>> call, Response<List<PostModel>> response) {
-                if (response.isSuccessful() && response.body() != null){
+                if (response.isSuccessful() && response.body() != null) {
                     adapter.setPostModelList(response.body());
                 }
             }
@@ -70,5 +78,33 @@ public class PostsFragment extends Fragment {
 
             }
         });
+    }
+
+    @Override
+    public void onClick(PostModel postModel) {
+        Navigation.findNavController(requireView()).navigate(PostsFragmentDirections.actionPostsFragmentToFormFragment(postModel.getTitle(), postModel.getContent()));
+    }
+
+    @Override
+    public void onLongClick(PostModel postModel) {
+        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(requireContext());
+        materialAlertDialogBuilder.setTitle("Подтвердите выбор");
+        materialAlertDialogBuilder.setMessage("Вы точно хотите удалить лист?");
+        materialAlertDialogBuilder.setNegativeButton("Отменить", null);
+        materialAlertDialogBuilder.setPositiveButton("Удалить", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                App.api.deletePost(postModel.getId()).enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        getPostApi();
+                    }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
+            }
+        }).show();
     }
 }
