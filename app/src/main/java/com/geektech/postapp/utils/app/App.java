@@ -1,4 +1,4 @@
-package com.geektech.postapp;
+package com.geektech.postapp.utils.app;
 
 import android.app.Application;
 

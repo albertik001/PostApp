@@ -21,11 +21,9 @@
         tools:layout="@layout/fragment_form">
 
         <argument
-            app:nullable="true"
             android:name="title"
             app:argType="string" />
         <argument
-            app:nullable="true"
             android:name="content"
             app:argType="string" />
     </fragment>

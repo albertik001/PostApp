@@ -13,7 +13,7 @@ public class PostModel implements Serializable {
     @SerializedName("group")
     int groupId;
 
-    public Integer getId() {
+    public Integer getId()   {
         return id;
     }
 

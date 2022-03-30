@@ -1,4 +1,4 @@
-package com.geektech.postapp;
+package com.geektech.postapp.utils.interfaces;
 
 import com.geektech.postapp.data.models.PostModel;
 
